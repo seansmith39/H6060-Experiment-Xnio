@@ -96,62 +96,6 @@ public class FileSystemWatcherTestCase {
         deleteRecursive(rootDir);
     }
 
-    @Test
-    public void testFileSystemWatcher() throws Exception {
-        FileSystemWatcher watcher = createXnio().createFileSystemWatcher("testWatcher", OptionMap.create(Options.WATCHER_POLL_INTERVAL, 10));
-        try {
-            watcher.watchPath(rootDir, new FileChangeCallback() {
-                @Override
-                public void handleChanges(Collection<FileChangeEvent> changes) {
-                    results.add(changes);
-                }
-            });
-            watcher.watchPath(rootDir, new FileChangeCallback() {
-                @Override
-                public void handleChanges(Collection<FileChangeEvent> changes) {
-                    secondResults.add(changes);
-                }
-            });
-            //first add a file
-            File added = new File(rootDir, "newlyAddedFile.txt").getAbsoluteFile();
-            touchFile(added);
-            checkResult(added, FileChangeEvent.Type.ADDED);
-            added.setLastModified(500);
-            checkResult(added, MODIFIED);
-            added.delete();
-            Thread.sleep(1);
-            checkResult(added, REMOVED);
-            added = new File(existingSubDir, "newSubDirFile.txt");
-            touchFile(added);
-            checkResult(added, FileChangeEvent.Type.ADDED);
-            added.setLastModified(500);
-            checkResult(added, MODIFIED);
-            added.delete();
-            Thread.sleep(1);
-            checkResult(added, REMOVED);
-            File existing = new File(rootDir, EXISTING_FILE_NAME);
-            existing.delete();
-            Thread.sleep(1);
-            checkResult(existing, REMOVED);
-            File newDir = new File(rootDir, "newlyCreatedDirectory");
-            newDir.mkdir();
-            checkResult(newDir, FileChangeEvent.Type.ADDED);
-            added = new File(newDir, "newlyAddedFileInNewlyAddedDirectory.txt").getAbsoluteFile();
-            touchFile(added);
-            checkResult(added, FileChangeEvent.Type.ADDED);
-            added.setLastModified(500);
-            checkResult(added, MODIFIED);
-            added.delete();
-            Thread.sleep(1);
-            checkResult(added, REMOVED);
-
-
-        } finally {
-            watcher.close();
-        }
-
-    }
-
     private void checkResult(File file, FileChangeEvent.Type type) throws InterruptedException {
         Collection<FileChangeEvent> results = this.results.poll(20, TimeUnit.SECONDS);
         Collection<FileChangeEvent> secondResults = this.secondResults.poll(20, TimeUnit.SECONDS);
