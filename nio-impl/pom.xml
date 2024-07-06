@@ -41,6 +41,7 @@
         <xnio.nio.selector.temp/>
         <xnio.nio.selector.provider/>
         <xnio.nio.alt-queued-server>true</xnio.nio.alt-queued-server>
+        <version.plugin.jacoco>0.8.12</version.plugin.jacoco>
     </properties>
 
     <dependencies>
@@ -110,6 +111,31 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${version.plugin.jacoco}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>**com.gargoylesoftware*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
